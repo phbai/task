@@ -1,83 +1,74 @@
 package main
 
 import (
-	"bytes"
+	"fmt"
 	"time"
 
-	"github.com/alecthomas/template"
-	"github.com/phbai/task/util"
+	"github.com/SlyMarbo/rss"
 )
 
 /**
 *
  */
-type Post struct {
-	ID       int           `json:"id"`
-	Name     string        `json:"name"`
-	URL      string        `json:"url"`
-	Interval time.Duration `json:"interval"`
-	Handler  string        `json:"handler"`
-	Status   string        `json:"status"`
-}
-
-/**
-*
- */
 type Task struct {
+	Name     string
+	URL      string
+	Interval time.Duration
+	LastName string
+	Handler  func()
+	Count    int
+	feed     *rss.Feed
 }
 
 /**
-*
+* 工作流程：
+* 从url获取feed  判断是否有feed更新
  */
-func (t Task) MakeListGraqhQL() util.GraqhQL {
-	graphqlTemplate := `{"query":"{\n  task {\n    id\n    name\n    interval\n    handler\n    url\n  }\n}","variables":null}`
-	tmpl, err := template.New("graphql").Parse(graphqlTemplate)
-	buf := new(bytes.Buffer)
-
-	if err != nil {
-		panic(err)
+func (t *Task) Start() {
+	for {
+		t.CheckRSS()
+		time.Sleep(t.Interval)
 	}
-	tmpl.Execute(buf, nil)
-
-	return util.GraqhQL(buf.String())
 }
 
 /**
 *
  */
-func (t Task) Add(p Post) {
-
+func (t *Task) CheckUpdate() {
+	t.CheckRSS()
 }
 
 /**
 *
  */
-func (t Task) MakeAddGraqhQL(p Post) util.GraqhQL {
-	graphqlTemplate := `{"query":"mutation insert_task {\n  insert_task(\n    objects: [\n      {\n        name: \"{{.Name}}\\",\n        url: \"{{.URL}}\\",\n        interval: \"{{.Interval}}\\",\n        handler: \"{{.Handler}}\\"\n      }\n    ]\n  ) {\n    returning {\n      id\n    }\n  }\n}","variables":null,"operationName":"insert_task"}`
-	tmpl, err := template.New("graphql").Parse(graphqlTemplate)
-	buf := new(bytes.Buffer)
-
-	if err != nil {
-		panic(err)
+func (t *Task) CheckRSS() {
+	if t.feed == nil {
+		t.feed, _ = rss.Fetch(t.URL)
+	} else {
+		t.feed.Update()
 	}
-	tmpl.Execute(buf, p)
-
-	return util.GraqhQL(buf.String())
-}
-
-/**
-*
- */
-func (t Task) MakeDeleteGraqhQL(id int) util.GraqhQL {
-	graphqlTemplate := `{"query":"mutation delete_task {\n  delete_task(\n    where: {id: {_eq: {{.}}}}\n  ) {\n    affected_rows\n  }\n}","variables":null,"operationName":"delete_task"}`
-	tmpl, err := template.New("graphql").Parse(graphqlTemplate)
-	buf := new(bytes.Buffer)
-
-	if err != nil {
-		panic(err)
+	for _, value := range t.feed.Items {
+		if !value.Read {
+			fmt.Printf("%s更新了 %s 地址: %s\n", t.Name, value.Title, value.Link)
+		}
+		value.Read = true
 	}
-	tmpl.Execute(buf, id)
-
-	return util.GraqhQL(buf.String())
-
 }
+
+// func (t Task) GetPosts(url string) {
+// 	feed, err := rss.Fetch(url)
+// 	if err != nil {
+// 		// handle error.
+// 	}
+
+// 	for _, v := range feed.Items {
+// 		v.Read = true
+// 	}
+
+// 	time.Sleep(time.Second * 10)
+// 	feed.Update()
+
+// 	fmt.Println(feed)
+// 	// feed.Update()
+// 	// fmt.Println(feed)
+// }

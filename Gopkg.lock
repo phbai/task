@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:31e5f77f2108a543768d6004de2e9982d3d3b675ca17f141c87d1686a3bdd656"
+  name = "github.com/SlyMarbo/rss"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "68c09f6cb0320b178346a4437bf43021008cc9b6"
+  version = "v1.0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:315c5f2f60c76d89b871c73f9bd5fe689cad96597afd50fb9992228ef80bdd34"
   name = "github.com/alecthomas/template"
@@ -21,6 +29,14 @@
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
 
 [[projects]]
+  branch = "master"
+  digest = "1:673c9c345144a4a631ae6f97a80e119367ad2d898306fcb05e64ce29d3b834d5"
+  name = "github.com/axgle/mahonia"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3358181d7394e26beccfae0ffde05193ef3be33a"
+
+[[projects]]
   digest = "1:c06d9e11d955af78ac3bbb26bd02e01d2f61f689e1a3bce2ef6fb683ef8a7f2d"
   name = "gopkg.in/alecthomas/kingpin.v2"
   packages = ["."]
@@ -32,6 +48,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/SlyMarbo/rss",
     "github.com/alecthomas/template",
     "gopkg.in/alecthomas/kingpin.v2",
   ]
