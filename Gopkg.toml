@@ -40,3 +40,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/axgle/mahonia"
+
+[[constraint]]
+  name = "github.com/mattn/go-runewidth"
+  version = "0.0.3"

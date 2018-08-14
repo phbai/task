@@ -7,6 +7,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"time"
+
+	runewidth "github.com/mattn/go-runewidth"
 )
 
 type job struct {
@@ -83,12 +85,23 @@ func addHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func fillRight(s string, w int) string {
+	return runewidth.FillRight(s, w)
+}
+
+func listHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "%s%s%s\n", fillRight("Name", 30), fillRight("URL", 50), fillRight("Interval", 30))
+	for _, v := range pq.Queue {
+		fmt.Fprintf(w, "%s%s%s\n", fillRight(v.Name, 30), fillRight(v.URL, 50), fillRight(v.Interval.String(), 30))
+	}
+}
+
 func deleteHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	task := &Task{Name: name}
 	if pq.Exists(task) {
 		pq.Delete(task)
-		println("任务删除成功")
+		println("%s 任务删除成功", task.Name)
 	} else {
 		fmt.Println("没有该任务")
 	}
@@ -97,11 +110,10 @@ func deleteHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
 /**
 *
  */
-func RunHTTP() {
+func RunHTTP(options map[string]string) {
 	const (
 		maxQueueSize = 100
 		maxWorkers   = 5
-		port         = "8080"
 	)
 	// create job channel
 	jobs := make(chan *Task, maxQueueSize)
@@ -125,9 +137,13 @@ func RunHTTP() {
 		// requestHandler(jobs, w, r)
 		addHandler(pq, w, r)
 	})
+	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		// requestHandler(jobs, w, r)
+		listHandler(pq, w, r)
+	})
 	http.HandleFunc("/delete", func(w http.ResponseWriter, r *http.Request) {
 		// requestHandler(jobs, w, r)
 		deleteHandler(pq, w, r)
 	})
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+options["port"], nil))
 }

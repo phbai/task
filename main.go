@@ -10,7 +10,8 @@ import (
 var (
 	task = kingpin.New("task", "A rss task runner.")
 
-	daemon = task.Command("daemon", "start the daemon")
+	daemon     = task.Command("daemon", "start the daemon")
+	daemonPort = daemon.Flag("port", "daemon port. dafault port is 8080").Default("8080").String()
 
 	list    = task.Command("list", "list the running tasks")
 	listAll = list.Flag("all", "list all the tasks.").Default("false").Bool()
@@ -30,8 +31,10 @@ func main() {
 	switch kingpin.MustParse(task.Parse(os.Args[1:])) {
 
 	case daemon.FullCommand():
-		fmt.Println("listen on the http://localhost:8080")
-		RunHTTP()
+		options := make(map[string]string)
+		options["port"] = *daemonPort
+		fmt.Printf("listen on the http://localhost:%s\n", options["port"])
+		RunHTTP(options)
 
 	case list.FullCommand():
 		// graqhql := gq.MakeListGraqhQL()

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -33,7 +32,6 @@ func (pq *PrepareQueue) Delete(task *Task) {
 		}
 	}
 
-	fmt.Println(queue)
 	pq.Queue = queue
 }
 
