@@ -17,7 +17,7 @@ type job struct {
 }
 
 func doWork(id int, t *Task) {
-	t.CheckUpdate()
+	t.Update()
 	// fmt.Printf("worker%d: started %s, working for %f seconds\n", id, j.name, j.duration.Seconds())
 	// time.Sleep(j.duration)
 	// fmt.Printf("worker%d: completed %s!\n", id, j.name)
@@ -65,14 +65,16 @@ func requestHandler(jobs chan *Task, w http.ResponseWriter, r *http.Request) {
 func addHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	url := r.FormValue("url")
+	exclude := r.FormValue("exclude")
 
+	fmt.Println(url, r.FormValue("interval"))
 	interval, err := time.ParseDuration(r.FormValue("interval"))
 	if err != nil {
 		http.Error(w, "Bad interval value: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	task := &Task{Name: name, URL: url, Interval: interval}
+	task := &Task{Name: name, URL: url, Interval: interval, Exclude: exclude}
 	if pq.Exists(task) {
 		println("已经存在该任务")
 	} else {
@@ -90,9 +92,9 @@ func fillRight(s string, w int) string {
 }
 
 func listHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%s%s%s\n", fillRight("Name", 30), fillRight("URL", 50), fillRight("Interval", 30))
+	fmt.Fprintf(w, "%s%s%s\n", fillRight("Name", 35), fillRight("URL", 55), fillRight("Interval", 30))
 	for _, v := range pq.Queue {
-		fmt.Fprintf(w, "%s%s%s\n", fillRight(v.Name, 30), fillRight(v.URL, 50), fillRight(v.Interval.String(), 30))
+		fmt.Fprintf(w, "%s%s%s\n", fillRight(v.Name, 35), fillRight(v.URL, 55), fillRight(v.Interval.String(), 30))
 	}
 }
 
@@ -101,7 +103,7 @@ func deleteHandler(pq *PrepareQueue, w http.ResponseWriter, r *http.Request) {
 	task := &Task{Name: name}
 	if pq.Exists(task) {
 		pq.Delete(task)
-		println("%s 任务删除成功", task.Name)
+		fmt.Printf("%s 任务删除成功\n", task.Name)
 	} else {
 		fmt.Println("没有该任务")
 	}

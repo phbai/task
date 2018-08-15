@@ -37,12 +37,39 @@
   revision = "3358181d7394e26beccfae0ffde05193ef3be33a"
 
 [[projects]]
+  digest = "1:9fe4b4f866007c9981c6c44c02d5533b1fb78ca408355eb64e767ef416eb9dfb"
+  name = "github.com/gorilla/rpc"
+  packages = [
+    "v2",
+    "v2/json2",
+  ]
+  pruneopts = "UT"
+  revision = "22c016f3df3febe0c1f6727598b6389507e03a18"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:43dd08a10854b2056e615d1b1d22ac94559d822e1f8b6fcc92c1a1057e85188e"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ea4d1f681babbce9545c9c5f3d5194a789c89f5b"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
   pruneopts = "UT"
   revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
   version = "v0.0.3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f7e656d0a45efcf25c000cd0517d11ed04d290ea3ed7c4bade76c557fcc8dd7e"
+  name = "github.com/zyxar/argo"
+  packages = ["rpc"]
+  pruneopts = "UT"
+  revision = "ed273472eb360693e59c795fd009428738942943"
 
 [[projects]]
   digest = "1:c06d9e11d955af78ac3bbb26bd02e01d2f61f689e1a3bce2ef6fb683ef8a7f2d"
@@ -59,6 +86,7 @@
     "github.com/SlyMarbo/rss",
     "github.com/alecthomas/template",
     "github.com/mattn/go-runewidth",
+    "github.com/zyxar/argo/rpc",
     "gopkg.in/alecthomas/kingpin.v2",
   ]
   solver-name = "gps-cdcl"

@@ -62,10 +62,10 @@ func (pq *PrepareQueue) Update() {
  */
 func (pq *PrepareQueue) Check() {
 	for _, task := range pq.Queue {
-		task.Count++
 		if task.Count%int(task.Interval/time.Second) == 0 {
 			// 放入队列
 			pq.WorkQueue <- task
 		}
+		task.Count++
 	}
 }

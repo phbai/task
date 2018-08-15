@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
+	"github.com/zyxar/argo/rpc"
 )
 
 /**
@@ -17,6 +19,7 @@ type Task struct {
 	LastName string
 	Handler  func()
 	Count    int
+	Exclude  string
 	feed     *rss.Feed
 }
 
@@ -34,7 +37,7 @@ func (t *Task) Start() {
 /**
 *
  */
-func (t *Task) CheckUpdate() {
+func (t *Task) Update() {
 	t.CheckRSS()
 }
 
@@ -47,11 +50,25 @@ func (t *Task) CheckRSS() {
 	} else {
 		t.feed.Update()
 	}
-	for _, value := range t.feed.Items {
-		if !value.Read {
-			fmt.Printf("%s更新了 %s 地址: %s\n", t.Name, value.Title, value.Link)
+	for _, item := range t.feed.Items {
+		if !item.Read && !strings.Contains(item.Title, t.Exclude) {
+			fmt.Printf("%s更新了 %s 地址: %s\n", t.Name, item.Title, item.Link)
+			t.HandleItem(item)
 		}
-		value.Read = true
+		item.Read = true
+	}
+}
+
+/**
+*
+ */
+func (t *Task) HandleItem(item *rss.Item) {
+	for _, v := range item.Enclosures {
+		p, err := rpc.New("http://localhost:6800/jsonrpc", "69378fb6a75b5d488073")
+		if err != nil {
+			println(err)
+		}
+		p.AddURI(v.URL)
 	}
 }
 
